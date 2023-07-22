@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="src/index.js" defer></script>
     <link rel="stylesheet" href="/src/styles/reset.css">
     <link rel="stylesheet" href="/src/styles/style.css">
     <link rel="shortcut icon" type="image/x-icon" href="assets/my-favicon.png">
@@ -15,95 +16,123 @@
         <div class="container">
             <h1 class="brand">ModularMeals</h1>
 
-            <form class="search-form"><strong>Search for Recipe</strong>
-                <input type="text" placeholder="Name of Recipe">
-                <ion-icon name="search-outline"></ion-icon>
-
-                <input type="number" id="min-time-input" placeholder="Minimum Time">
-                <input type="number" id="max-time-input" placeholder="Maximum Time">
-                <input type="number" id="min-calories-input" placeholder="Minimum Calories">
-                <input type="number" id="max-calories-input" placeholder="Maximum Calories">
-                <input type="number" id="min-carbs-input" placeholder="Minimum Carbs (in grams)">
-                <input type="number" id="max-carbs-input" placeholder="Maximum Carbs (in grams)">
-                <input type="number" id="min-fat-input" placeholder="Minimum Fat (in grams)">
-                <input type="number" id="max-fat-input" placeholder="Maximum Fat (in grams)">
-                <input type="number" id="min-protein-input" placeholder="Minimum Protein (in grams)">
-                <input type="number" id="max-protein-input" placeholder="Maximum Protein (in grams)">
-
-                <select class="meal-type-input"> 
-                    <option value="" disabled selected class="default-meal-type-input">--Select Meal Type--</option>
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
-                    <option value="Snack">Snack</option>
-                </select>
-
-                <select class="cuisine-input">
-                    <option value="" disabled selected class="default-cuisine-input">--Select Cuisine--</option>
-                    <option value="American">American</option>
-                    <option value="Asian">Asian</option>
-                    <option value="Caribbean">Central Europe</option>
-                    <option value="Chinese">Chinese</option>
-                    <option value="Eastern Europe">Eastern Europe</option>
-                    <option value="French">French</option>
-                    <option value="Indian">Indian</option>
-                    <option value="Italian">Italian</option>
-                    <option value="Japanese">Japanese</option>
-                    <option value="Kosher">Kosher</option>
-                    <option value="Mediterranean">Mediterranean</option>
-                    <option value="Mexican">Mexican</option>
-                    <option value="Middle Eastern">Middle Eastern</option>
-                    <option value="Nordic">Nordic</option>
-                    <option value="South American">South American</option>
-                    <option value="South East Asian">South East Asian</option>
-                </select>
-
-                <div class="dietary-restrictions">
-                    <h4>Select Dietary Restrictions:</h4>
-                    <label><input type="checkbox" name="diet" value="alcohol-free">Alcohol-free</label>
-                    <label><input type="checkbox" name="diet" value="celery-free">Celery-free</label>
-                    <label><input type="checkbox" name="diet" value="crustacean-free">Crustacean-free</label>
-                    <label><input type="checkbox" name="diet" value="dairy-free">Dairy-free</label>
-                    <label><input type="checkbox" name="diet" value="dash">DASH</label>
-                    <label><input type="checkbox" name="diet" value="egg-free">Egg-free</label>
-                    <label><input type="checkbox" name="diet" value="fish-free">Fish-free</label>
-                    <label><input type="checkbox" name="diet" value="fodmap-free">FODMAP-free</label>
-                    <label><input type="checkbox" name="diet" value="gluten-free">Gluten-free</label>
-                    <label><input type="checkbox" name="diet" value="immuno-supportive">Immuno-supportive</label>
-                    <label><input type="checkbox" name="diet" value="keto-friendly">Keto-friendly</label>
-                    <label><input type="checkbox" name="diet" value="kidney-friendly">Kidney-friendly</label>
-                    <label><input type="checkbox" name="diet" value="kosher">Kosher</label>
-                    <label><input type="checkbox" name="diet" value="low-potassium">Low-potassium</label>
-                    <label><input type="checkbox" name="diet" value="low-sugar">Low-sugar</label>
-                    <label><input type="checkbox" name="diet" value="lupine-free">Lupine-free</label>
-                    <label><input type="checkbox" name="diet" value="mediterranean">Mediterranean</label>
-                    <label><input type="checkbox" name="diet" value="mollusk-free">Mollusk-free</label>
-                    <label><input type="checkbox" name="diet" value="mustard-free">Mustard-free</label>
-                    <label><input type="checkbox" name="diet" value="no-oil-added">No-oil-added</label>
-                    <label><input type="checkbox" name="diet" value="paleo">Paleo</label>
-                    <label><input type="checkbox" name="diet" value="pescatarian">Pescatarian</label>
-                    <label><input type="checkbox" name="diet" value="pork-free">Pork-free</label>
-                    <label><input type="checkbox" name="diet" value="red-meat-free">Red-meat-free</label>
-                    <label><input type="checkbox" name="diet" value="sesame-free">Sesame-free</label>
-                    <label><input type="checkbox" name="diet" value="shellfish-free">Shellfish-free</label>
-                    <label><input type="checkbox" name="diet" value="soy-free">Soy-free</label>
-                    <label><input type="checkbox" name="diet" value="sugar-conscious">Sugar-conscious</label>
-                    <label><input type="checkbox" name="diet" value="sulfite-free">Sulfite-free</label>
-                    <label><input type="checkbox" name="diet" value="tree-nut-free">Tree-nut free</label>
-                    <label><input type="checkbox" name="diet" value="peanut-free">Peanut-free</label>
-                    <label><input type="checkbox" name="diet" value="vegan">Vegan</label>
-                    <label><input type="checkbox" name="diet" value="vegetarian">Vegetarian</label>
-                    <label><input type="checkbox" name="diet" value="wheat-free">Wheat-free</label>
+            <form class="search-form">
+                <div class="search-bar">
+                    <input class="text-box" type="text" placeholder="Name of Recipe">
+                    <ion-icon name="search-outline"></ion-icon>
                 </div>
 
-                <p class="ingredient-search-field">Enter ingredients to be <b>included</b>, separated by a comma: 
-                    <input type="text">
+                <div class="time">Time (in mins):
+                    <div>
+                        <input type="number" id="min-time-input" placeholder="Minimum">
+                        <input type="number" id="max-time-input" placeholder="Maximum">
+                    </div>
+                </div>
+
+                <div class="calories">Calories: 
+                    <div>
+                        <input type="number" id="min-calories-input" placeholder="Minimum">
+                        <input type="number" id="max-calories-input" placeholder="Maximum">    
+                    </div>
+                </div>
+
+                <div class="carbs">Carbohydrates (in grams):
+                    <div>
+                        <input type="number" id="min-carbs-input" placeholder="Minimum">
+                        <input type="number" id="max-carbs-input" placeholder="Maximum">
+                    </div>
+                </div>
+
+                <div class="fat">Fat (in grams):
+                    <div>
+                        <input type="number" id="min-fat-input" placeholder="Minimum">
+                        <input type="number" id="max-fat-input" placeholder="Maximum">
+                    </div>
+                </div>
+
+                <div class="protein">Protein (in grams):
+                    <div>
+                        <input type="number" id="min-protein-input" placeholder="Minimum">
+                        <input type="number" id="max-protein-input" placeholder="Maximum">
+                    </div>
+                </div>
+
+                <div class="inputs-wrapper">
+                    <select class="meal-type-input"> 
+                        <option value="" disabled selected class="default-meal-type-input">--Select Meal Type--</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Snack">Snack</option>
+                    </select>
+    
+                    <select class="cuisine-input">
+                        <option value="" disabled selected class="default-cuisine-input">--Select Cuisine--</option>
+                        <option value="American">American</option>
+                        <option value="Asian">Asian</option>
+                        <option value="Caribbean">Central Europe</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Eastern Europe">Eastern Europe</option>
+                        <option value="French">French</option>
+                        <option value="Indian">Indian</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Kosher">Kosher</option>
+                        <option value="Mediterranean">Mediterranean</option>
+                        <option value="Mexican">Mexican</option>
+                        <option value="Middle Eastern">Middle Eastern</option>
+                        <option value="Nordic">Nordic</option>
+                        <option value="South American">South American</option>
+                        <option value="South East Asian">South East Asian</option>
+                    </select>
+                </div>
+
+                <div class="dietary-restrictions">
+                    <p class="form-title">Select Dietary Restrictions:</p>
+
+                    <div class="restrictions-grid">
+                        <label><input type="checkbox" name="diet" value="alcohol-free">Alcohol-free</label>
+                        <label><input type="checkbox" name="diet" value="celery-free">Celery-free</label>
+                        <label><input type="checkbox" name="diet" value="crustacean-free">Crustacean-free</label>
+                        <label><input type="checkbox" name="diet" value="dairy-free">Dairy-free</label>
+                        <label><input type="checkbox" name="diet" value="dash">DASH</label>
+                        <label><input type="checkbox" name="diet" value="egg-free">Egg-free</label>
+                        <label><input type="checkbox" name="diet" value="fish-free">Fish-free</label>
+                        <label><input type="checkbox" name="diet" value="fodmap-free">FODMAP-free</label>
+                        <label><input type="checkbox" name="diet" value="gluten-free">Gluten-free</label>
+                        <label><input type="checkbox" name="diet" value="immuno-supportive">Immuno-supportive</label>
+                        <label><input type="checkbox" name="diet" value="keto-friendly">Keto-friendly</label>
+                        <label><input type="checkbox" name="diet" value="kidney-friendly">Kidney-friendly</label>
+                        <label><input type="checkbox" name="diet" value="kosher">Kosher</label>
+                        <label><input type="checkbox" name="diet" value="low-potassium">Low-potassium</label>
+                        <label><input type="checkbox" name="diet" value="low-sugar">Low-sugar</label>
+                        <label><input type="checkbox" name="diet" value="lupine-free">Lupine-free</label>
+                        <label><input type="checkbox" name="diet" value="mediterranean">Mediterranean</label>
+                        <label><input type="checkbox" name="diet" value="mollusk-free">Mollusk-free</label>
+                        <label><input type="checkbox" name="diet" value="mustard-free">Mustard-free</label>
+                        <label><input type="checkbox" name="diet" value="no-oil-added">No-oil-added</label>
+                        <label><input type="checkbox" name="diet" value="paleo">Paleo</label>
+                        <label><input type="checkbox" name="diet" value="pescatarian">Pescatarian</label>
+                        <label><input type="checkbox" name="diet" value="pork-free">Pork-free</label>
+                        <label><input type="checkbox" name="diet" value="red-meat-free">Red-meat-free</label>
+                        <label><input type="checkbox" name="diet" value="sesame-free">Sesame-free</label>
+                        <label><input type="checkbox" name="diet" value="shellfish-free">Shellfish-free</label>
+                        <label><input type="checkbox" name="diet" value="soy-free">Soy-free</label>
+                        <label><input type="checkbox" name="diet" value="sugar-conscious">Sugar-conscious</label>
+                        <label><input type="checkbox" name="diet" value="sulfite-free">Sulfite-free</label>
+                        <label><input type="checkbox" name="diet" value="tree-nut-free">Tree-nut free</label>
+                        <label><input type="checkbox" name="diet" value="peanut-free">Peanut-free</label>
+                        <label><input type="checkbox" name="diet" value="vegan">Vegan</label>
+                        <label><input type="checkbox" name="diet" value="vegetarian">Vegetarian</label>
+                        <label><input type="checkbox" name="diet" value="wheat-free">Wheat-free</label>
+                    </div>
+                </div>
+                
+                <p class="ingredient-search-field">Enter ingredients that the recipe <b>cannot</b> contain, separated by a comma:
+                    <input class="text-box" type="text">
                 </p>
                 
-                <p class="ingredient-search-field">Enter ingredients to be <b>excluded</b>, separated by a comma:
-                    <input type="text">
-                </p>
-                <button type="submit"><ion-icon name="search-outline"></ion-icon></button>
+                <button class="submit-button" type="submit">Search Recipes</button>
             </form>
 
             <div class="search-result">
@@ -111,7 +140,6 @@
         </div>
     </section>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script src="src/index.js"></script>
 </body>
 
 </html>

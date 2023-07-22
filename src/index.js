@@ -12,24 +12,28 @@ searchForm.addEventListener('submit', (e) => {
 
 async function fetchAPI(searchParams) {
     let queryParameters = {
-        q: searchParams.searchQuery,
-        time: searchParams.minTime ? `${searchParams.minTime}-${searchParams.maxTime || '*'}`
-            : searchParams.maxTime ? `*-${searchParams.maxTime}` : undefined,
-        calories: searchParams.minCalories ? `${searchParams.minCalories}-${searchParams.maxCalories || '*'}`
-            : searchParams.maxCalories ? `*-${searchParams.maxCalories}` : undefined,
-        carbs: searchParams.minCarbs ? `${searchParams.minCarbs}-${searchParams.maxCarbs || '*'}`
+        q: searchParams.searchQuery.length > 0 ? searchParams.searchQuery : undefined,
+        time: searchParams.minTime && searchParams.maxTime ? `${searchParams.minTime}-${searchParams.maxTime}`
+            : searchParams.minTime ? `${searchParams.minTime}+`
+            : searchParams.maxTime ? `${searchParams.maxTime}`
+            : undefined,
+        calories: searchParams.minCalories && searchParams.maxCalories ? `${searchParams.minCalories}-${searchParams.maxCalories}`
+            : searchParams.minCalories ? `${searchParams.minCalories}+`
+            : searchParams.maxCalories ? `${searchParams.maxCalories}`
+            : undefined,
+        'nutrients[CHOCDF]': searchParams.minCarbs ? `${searchParams.minCarbs}-${searchParams.maxCarbs || '*'}`
             : searchParams.maxCarbs ? `*-${searchParams.maxCarbs}` : undefined,
-        fat: searchParams.minFat ? `${searchParams.minFat}-${searchParams.maxFat || '*'}`
+        'nutrients[FAT]': searchParams.minFat ? `${searchParams.minFat}-${searchParams.maxFat || '*'}`
             : searchParams.maxFat ? `*-${searchParams.maxFat}` : undefined,
-        protein: searchParams.minProtein ? `${searchParams.minProtein}-${searchParams.maxProtein || '*'}`
+        'nutrients[PROCNT]': searchParams.minProtein ? `${searchParams.minProtein}-${searchParams.maxProtein || '*'}`
             : searchParams.maxProtein ? `*-${searchParams.maxProtein}` : undefined,
         mealType: searchParams.mealType || undefined,
         cuisineType: searchParams.cuisine || undefined,
         diet: searchParams.dietRestrictions.length > 0 ? searchParams.dietRestrictions.join(',') : undefined,
-        ingr: searchParams.includedIngredients.length > 0 ? searchParams.includedIngredients.join(',') : undefined,
-        excl: searchParams.excludedIngredients.length > 0 ? searchParams.excludedIngredients.join(',') : undefined
+        excluded: searchParams.excludedIngredients.length > 0 ? searchParams.excludedIngredients : undefined
     }
     
+    console.log("queryParameters", queryParameters);
     let baseURL = `http://localhost:5001?url=https://api.edamam.com/api/recipes/v2`;
     
     let fullURL = Object.keys(queryParameters)
@@ -37,18 +41,21 @@ async function fetchAPI(searchParams) {
         .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(queryParameters[key]))
         .join('&');
 
-    baseURL = `${baseURL}?${fullURL}&app_id=${appId}&app_key=${appKey}`;
+    console.log("fullURL: ", fullURL)
+
+    baseURL = `${baseURL}?${fullURL}&random=true&app_id=${appId}&app_key=${appKey}`;
+    console.log("baseURL: ", baseURL);
 
     const response = await fetch(baseURL);
     const data = await response.json();
     generateHTML(data.hits);
-    console.log(data);
 }
 
 function getSearchParams(form) {
-    let searchQuery = form.querySelector('input[type="text"]').value;
+    let searchQuery = document.querySelector('input[type="text"]').value;
 
     let minTime = document.querySelector('#min-time-input').value;
+    console.log("minTime: ", minTime);
     let maxTime = document.querySelector('#max-time-input').value;
     let minCalories = document.querySelector('#min-calories-input').value;
     let maxCalories = document.querySelector('#max-calories-input').value;
@@ -61,11 +68,11 @@ function getSearchParams(form) {
     let mealType = document.querySelector('.meal-type-input').value;
     let cuisineType = document.querySelector('.cuisine-input').value;
     let dietRestrictions = Array.from(document.querySelectorAll('.dietary-restrictions input[type="checkbox"]:checked')).map(el => el.value) || [];
-    let includedIngredients = (document.querySelectorAll('.ingredient-search-field')[0].querySelector('input[type="text"]').value.split(',').map(item => item.trim())) || [];
-    let excludedIngredients = (document.querySelectorAll('.ingredient-search-field')[1].querySelector('input[type="text"]').value.split(',').map(item => item.trim())) || [];
+    let excludedIngredients = (document.querySelector('.ingredient-search-field').querySelector('input[type="text"]').value.split(',').map(item => item.trim())).filter(item => item.length > 0) || [];
+
 
     return {
-        searchQuery, minTime, maxTime, minCalories, maxCalories, minCarbs, maxCarbs, minFat, maxFat, minProtein, maxProtein, mealType, cuisineType, dietRestrictions, includedIngredients, excludedIngredients
+        searchQuery, minTime, maxTime, minCalories, maxCalories, minCarbs, maxCarbs, minFat, maxFat, minProtein, maxProtein, mealType, cuisineType, dietRestrictions, excludedIngredients
     };
 }
 function generateHTML(results) {

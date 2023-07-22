@@ -1,10 +1,10 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 
 :root {
     --background: #b8e1dd;
     --recipebackground: #85c4bd;
     --title: #062925;
-    --headings: #044a42;
+    --headings: hsl(173, 90%, 15%);
     --text: #3a9188;
 }
 
@@ -30,7 +30,7 @@ section {
 }
 
 .container {
-    width: 90%;
+    width: 60%;
     height: auto;
     max-width: 1200px;
     margin: 0 auto;
@@ -44,21 +44,22 @@ section {
 }
 
 form {
-    width: 90%;
-    max-width: 300px;
+    width: 100%;
+    max-width: 1000px;
     margin: 20px auto;
     background-color: white;
-    border-radius: 4px;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.search-bar {
+    position: relative;
+    width: 100%;
 }
 
 form input {
-    width: 82%;
-    background-color: transparent;
-    padding: 10px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    display: inline-block
+    width: 100%;
+    padding: 10px 40px 10px 10px;
 }
 
 form ion-icon {
@@ -66,6 +67,21 @@ form ion-icon {
     font-size: 20px;
     margin: -4px;
     color: var(--title);
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.form-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px 0;
+}
+
+form div:not(:last-child) {
+    margin-bottom: 20px;
 }
 
 .search-result {
@@ -78,7 +94,7 @@ form ion-icon {
 
 .item {
     width: 100%;
-    border-radius: 8px;
+    border-radius: 5px;
     background-color: var(--recipebackground);
     padding: 5px;
     overflow: hidden;
@@ -87,7 +103,7 @@ form ion-icon {
 .item img {
     width: 100%;
     height: 300px;
-    border-radius: 4px;
+    border-radius: 5px;
 }
 
 .item .flex-container {
@@ -109,7 +125,7 @@ form ion-icon {
     padding: 5px 0;
     background-color: var(--text);
     color: var(--title);
-    border-radius: 20px;
+    border-radius: 50px;
     font-size: 12px;
     margin-top: 14px;
     align-self: flex-start;
@@ -121,4 +137,61 @@ form ion-icon {
     margin-top: 10px;
     margin-left: 10px;
     font-size: 12px;
-} */
+}
+
+strong {
+    font-weight: bold;
+}
+
+.time, .calories, .carbs, .fat, .protein {
+    display: flex;
+    justify-content: space-between;
+}
+
+.time > div, .calories > div, .carbs > div, .fat > div, .protein > div {
+    display: flex;
+    justify-content: flex-end;
+    width: 60%;
+}
+
+.meal-type-input, .cuisine-input {
+    font-family: 'Lato';
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+    width: 35%;
+    border: 1px solid lightgray;
+}
+
+.inputs-wrapper {
+    display: flex;
+    justify-content: space-around;
+}
+
+.text-box {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.submit-button {
+    background-color: var(--title);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+}
+
+.submit-button:hover {
+    background-color: var(--text);
+}
+
+.ingredient-search-field {
+    margin-bottom: 20px;
+}
+
