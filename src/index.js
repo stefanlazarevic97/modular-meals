@@ -14,19 +14,25 @@ async function fetchAPI(searchParams) {
     let queryParameters = {
         q: searchParams.searchQuery.length > 0 ? searchParams.searchQuery : undefined,
         time: searchParams.minTime && searchParams.maxTime ? `${searchParams.minTime}-${searchParams.maxTime}`
-            : searchParams.minTime ? `${searchParams.minTime}+`
+            : searchParams.minTime ? `${parseFloat(searchParams.minTime)}+`
             : searchParams.maxTime ? `${searchParams.maxTime}`
             : undefined,
         calories: searchParams.minCalories && searchParams.maxCalories ? `${searchParams.minCalories}-${searchParams.maxCalories}`
             : searchParams.minCalories ? `${searchParams.minCalories}+`
             : searchParams.maxCalories ? `${searchParams.maxCalories}`
             : undefined,
-        'nutrients[CHOCDF]': searchParams.minCarbs ? `${searchParams.minCarbs}-${searchParams.maxCarbs || '*'}`
-            : searchParams.maxCarbs ? `*-${searchParams.maxCarbs}` : undefined,
-        'nutrients[FAT]': searchParams.minFat ? `${searchParams.minFat}-${searchParams.maxFat || '*'}`
-            : searchParams.maxFat ? `*-${searchParams.maxFat}` : undefined,
-        'nutrients[PROCNT]': searchParams.minProtein ? `${searchParams.minProtein}-${searchParams.maxProtein || '*'}`
-            : searchParams.maxProtein ? `*-${searchParams.maxProtein}` : undefined,
+        'nutrients[CHOCDF]': searchParams.minCarbs && searchParams.maxCarbs ? `${searchParams.minCarbs}-${searchParams.maxCarbs}`
+            : searchParams.minCarbs ? `${searchParams.minCarbs}+`
+            : searchParams.maxCarbs ? `${searchParams.maxCarbs}`
+            : undefined,
+        'nutrients[FAT]': searchParams.minFat && searchParams.maxFat ? `${searchParams.minFat}-${searchParams.maxFat}`
+            : searchParams.minFat ? `${searchParams.minFat}+`
+            : searchParams.maxFat ? `${searchParams.maxFat}`
+            : undefined,
+        'nutrients[PROCNT]': searchParams.minProtein && searchParams.maxProtein ? `${searchParams.minProtein}-${searchParams.maxProtein}`
+            : searchParams.minProtein ? `${searchParams.minProtein}+`
+            : searchParams.maxProtein ? `${searchParams.maxProtein}`
+            : undefined,
         mealType: searchParams.mealType || undefined,
         cuisineType: searchParams.cuisine || undefined,
         diet: searchParams.dietRestrictions.length > 0 ? searchParams.dietRestrictions.join(',') : undefined,
@@ -43,11 +49,17 @@ async function fetchAPI(searchParams) {
 
     console.log("fullURL: ", fullURL)
 
-    baseURL = `${baseURL}?${fullURL}&random=true&app_id=${appId}&app_key=${appKey}`;
-    console.log("baseURL: ", baseURL);
+    baseURL = `${baseURL}?app_id=${appId}&app_key=${appKey}&random=true&${fullURL}`;
+    temp = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${appId}&app_key=${appKey}&random=true&${fullURL}`
+    console.log("temp: ", temp);
 
-    const response = await fetch(baseURL);
+    testURL = `https://api.edamam.com/api/recipes/v2?type=public&app_id=9571bf1b&app_key=fd421218cb6bedd9fe774a93dd05e16e&time=${encodeURIComponent(queryParameters.time)}`;
+    console.log("testURL: ", testURL);
+
+    const response = await fetch(temp);
+    console.log("response: ", response);
     const data = await response.json();
+    console.log("data: ", data);
     generateHTML(data.hits);
 }
 
@@ -77,6 +89,7 @@ function getSearchParams(form) {
 }
 function generateHTML(results) {
     let newHTML = '';
+    console.log("test: ", results[0].recipe);
     
     results.map((result) => {
         newHTML += `
