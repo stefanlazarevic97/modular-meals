@@ -11,6 +11,7 @@ searchForm.addEventListener('submit', (e) => {
 })
 
 async function fetchAPI(searchParams) {
+    console.log("searchParams: ", searchParams);
     let queryParameters = {
         q: searchParams.searchQuery.length > 0 ? searchParams.searchQuery : undefined,
         time: searchParams.minTime && searchParams.maxTime ? `${searchParams.minTime}-${searchParams.maxTime}`
@@ -34,40 +35,34 @@ async function fetchAPI(searchParams) {
             : searchParams.maxProtein ? `${searchParams.maxProtein}`
             : undefined,
         mealType: searchParams.mealType || undefined,
-        cuisineType: searchParams.cuisine || undefined,
-        diet: searchParams.dietRestrictions.length > 0 ? searchParams.dietRestrictions.join(',') : undefined,
+        cuisineType: searchParams.cuisineType ? searchParams.cuisineType.toLowerCase() : undefined,
+        health: searchParams.dietRestrictions.length > 0 ? searchParams.dietRestrictions : undefined,
         excluded: searchParams.excludedIngredients.length > 0 ? searchParams.excludedIngredients : undefined
     }
-    
-    console.log("queryParameters", queryParameters);
-    let baseURL = `http://localhost:5001?url=https://api.edamam.com/api/recipes/v2`;
-    
-    let fullURL = Object.keys(queryParameters)
+
+    // let baseURL = `http://localhost:5001?url=https://api.edamam.com/api/recipes/v2&type=public&app_id=${appId}&app_key=${appKey}&random=true`;
+    console.log("queryParameters: ", queryParameters);
+
+    let searchURL = Object.keys(queryParameters)
         .filter(key => queryParameters[key] !== undefined)
-        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(queryParameters[key]))
+        .flatMap(key => {
+            if (Array.isArray(queryParameters[key])) {
+                return queryParameters[key].map(value => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+            } else {
+                return `${encodeURIComponent(key)}=${encodeURIComponent(queryParameters[key])}`;
+            }
+        })
         .join('&');
-
-    console.log("fullURL: ", fullURL)
-
-    baseURL = `${baseURL}?app_id=${appId}&app_key=${appKey}&random=true&${fullURL}`;
-    temp = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${appId}&app_key=${appKey}&random=true&${fullURL}`
-    console.log("temp: ", temp);
-
-    testURL = `https://api.edamam.com/api/recipes/v2?type=public&app_id=9571bf1b&app_key=fd421218cb6bedd9fe774a93dd05e16e&time=${encodeURIComponent(queryParameters.time)}`;
-    console.log("testURL: ", testURL);
-
-    const response = await fetch(temp);
-    console.log("response: ", response);
+        
+    fullURL = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${appId}&app_key=${appKey}&random=true&${searchURL}`;
+    const response = await fetch(fullURL);
     const data = await response.json();
-    console.log("data: ", data);
     generateHTML(data.hits);
 }
 
 function getSearchParams(form) {
     let searchQuery = document.querySelector('input[type="text"]').value;
-
     let minTime = document.querySelector('#min-time-input').value;
-    console.log("minTime: ", minTime);
     let maxTime = document.querySelector('#max-time-input').value;
     let minCalories = document.querySelector('#min-calories-input').value;
     let maxCalories = document.querySelector('#max-calories-input').value;
@@ -79,9 +74,9 @@ function getSearchParams(form) {
     let maxProtein = document.querySelector('#max-protein-input').value;
     let mealType = document.querySelector('.meal-type-input').value;
     let cuisineType = document.querySelector('.cuisine-input').value;
+    // console.log("Cuisine Type: ", cuisineType);
     let dietRestrictions = Array.from(document.querySelectorAll('.dietary-restrictions input[type="checkbox"]:checked')).map(el => el.value) || [];
     let excludedIngredients = (document.querySelector('.ingredient-search-field').querySelector('input[type="text"]').value.split(',').map(item => item.trim())).filter(item => item.length > 0) || [];
-
 
     return {
         searchQuery, minTime, maxTime, minCalories, maxCalories, minCarbs, maxCarbs, minFat, maxFat, minProtein, maxProtein, mealType, cuisineType, dietRestrictions, excludedIngredients
@@ -89,7 +84,6 @@ function getSearchParams(form) {
 }
 function generateHTML(results) {
     let newHTML = '';
-    console.log("test: ", results[0].recipe);
     
     results.map((result) => {
         newHTML += `
