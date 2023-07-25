@@ -1,3 +1,4 @@
+const usdaApiKey = 'UbpcAswEuzbbCwPhKaJdUxIkeAMUean4rUUDq9ij';
 const searchResultDiv = document.querySelector('.search-result');
 
 export function generateHTML(results) {
@@ -34,13 +35,14 @@ export function generateHTML(results) {
 
     searchResultDiv.innerHTML = newHTML;
 
-    // Add event listeners to all the "Modify Recipe" buttons
     document.querySelectorAll('.modify-recipe-button').forEach((button) => {
-        button.addEventListener('click', (event) => {
+        button.addEventListener('click', async (event) => {
             const recipeId = event.target.dataset.recipeId;
             const selectedRecipe = results[recipeId].recipe;
             const ingredientObj = getNutritionalInformation(selectedRecipe);
             console.log(ingredientObj);
+            const nutritionObj = createNutritionObject(selectedRecipe);
+            console.log(nutritionObj);
         });
     });
 }
@@ -53,4 +55,52 @@ export function getNutritionalInformation(recipe) {
     });
 
     return ingredientObj;
+}
+
+
+export function createNutritionObject(recipe) {
+    let servings = recipe.yield;
+
+    // recommended daily intake for micronutrients
+    const RDI = {
+        'Cholesterol': 300,
+        'Sodium': 2300,
+        'Potassium': 4700,
+        'Magnesium': 420,
+        'Calcium': 1000,
+        'Iron': 18,
+        'Zinc': 11,
+        'VitaminA': 900,
+        'VitaminE': 15,
+        'VitaminC': 90,
+        'VitaminB6': 1.7,
+        'VitaminB12': 2.4,
+        'VitaminD': 20,
+        'VitaminK': 120
+    };
+
+    return {
+        'Calories': (recipe.calories / servings).toFixed(2),
+        'Protein': (recipe.totalNutrients.PROCNT.quantity / servings).toFixed(2),
+        'Fat': (recipe.totalNutrients.FAT.quantity / servings).toFixed(2),
+        'Saturated Fat': (recipe.totalNutrients.FASAT.quantity / servings).toFixed(2),
+        'Trans Fat': (recipe.totalNutrients.FATRN.quantity / servings).toFixed(2),
+        'Carbohydrates': (recipe.totalNutrients.CHOCDF.quantity / servings).toFixed(2),
+        'Sugar': (recipe.totalNutrients.SUGAR.quantity / servings).toFixed(2),
+        'Fiber': (recipe.totalNutrients.FIBTG.quantity / servings).toFixed(2),
+        'Cholesterol': ((recipe.totalNutrients.CHOLE.quantity / RDI.Cholesterol / servings) * 100).toFixed(2),
+        'Sodium': ((recipe.totalNutrients.NA.quantity / RDI.Sodium / servings) * 100).toFixed(2),
+        'Potassium': ((recipe.totalNutrients.K.quantity / RDI.Potassium / servings) * 100).toFixed(2),
+        'Magnesium': ((recipe.totalNutrients.MG.quantity / RDI.Magnesium / servings) * 100).toFixed(2),
+        'Vitamin A': ((recipe.totalNutrients.VITA_RAE.quantity / RDI.VitaminA / servings) * 100).toFixed(2),
+        'Vitamin E': ((recipe.totalNutrients.TOCPHA.quantity / RDI.VitaminE / servings) * 100).toFixed(2),
+        'Vitamin C': ((recipe.totalNutrients.VITC.quantity / RDI.VitaminC / servings) * 100).toFixed(2),
+        'Vitamin B6': ((recipe.totalNutrients.VITB6A.quantity / RDI.VitaminB6 / servings) * 100).toFixed(2),
+        'Vitamin B12': ((recipe.totalNutrients.VITB12.quantity / RDI.VitaminB12 / servings) * 100).toFixed(2),
+        'Vitamin D': ((recipe.totalNutrients.VITD.quantity / RDI.VitaminD / servings) * 100).toFixed(2),
+        'Vitamin K': ((recipe.totalNutrients.VITK1.quantity / RDI.VitaminK / servings) * 100).toFixed(2),
+        'Calcium': ((recipe.totalNutrients.CA.quantity / RDI.Calcium / servings) * 100).toFixed(2),
+        'Iron': ((recipe.totalNutrients.FE.quantity / RDI.Iron / servings) * 100).toFixed(2),
+        'Zinc': ((recipe.totalNutrients.ZN.quantity / RDI.Zinc / servings) * 100).toFixed(2)
+    };
 }
