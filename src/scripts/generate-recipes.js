@@ -2,7 +2,8 @@ import { drawPieChart } from "./pie-chart.js";
 import { drawBarChart } from "./bar-chart.js";
 import { capitalizeFirstLetter } from "./util.js";
 
-const usdaApiKey = 'UbpcAswEuzbbCwPhKaJdUxIkeAMUean4rUUDq9ij';
+const nutritionId = '0cc0aea0';
+const nutritionKey = '1e077dc53566f535c8e43010f6e729d5';
 const searchResultDiv = document.querySelector('.search-result');
 
 export function generateHTML(results) {
@@ -53,12 +54,13 @@ export function generateHTML(results) {
             searchForm.innerHTML = '';
             var ingredientsDiv = document.querySelector('.ingredients-list');
             ingredientsDiv.innerHTML = '';
-        
+
             let tableHTML = `
                 <table>
                     <tr>
                         <th>Ingredient</th>
                         <th>Weight (g)</th>
+                        <th>Actions</th>
                     </tr>
                 `;
 
@@ -67,13 +69,21 @@ export function generateHTML(results) {
                     <tr>
                         <td>${capitalizeFirstLetter(ingredient)}</td>
                         <td>${Math.floor(weight)}</td>
+                        <td>
+                            <button class="remove-button">Remove</button>
+                            <button class="modify-button">Modify Quantity</button>
+                        </td>
                     </tr>
                 `;
             });
 
-            tableHTML += `</table>`;
+            tableHTML += `
+                </table>
+                <button class="add-button">Add Ingredient</button>
+            `;
 
             ingredientsDiv.innerHTML = tableHTML;
+
 
             var caloriesDiv = document.createElement('h2');
             caloriesDiv.innerHTML = `Total Calories: ${nutritionObj.Calories}`;
@@ -99,19 +109,29 @@ export function generateHTML(results) {
             var micronutrients = ['Cholesterol', 'Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Iron', 'Zinc', 'VitaminA', 'VitaminE', 'VitaminC', 'VitaminB6', 'VitaminB12', 'VitaminD', 'VitaminK'];
             drawBarChart(svgBar, micronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
             nutritionDiv.append(svgBar.node());
+
+            document.querySelectorAll('.remove-button').forEach(button => {
+                button.addEventListener('click', async function (e) {
+                    const ingredient = e.target.parentElement.parentElement.children[0].textContent;
+                    const weight = e.target.parentElement.parentElement.children[1].textContent;
+                    const response = await fetch(`https://api.edamam.com/api/nutrition-data?app_id=${nutritionId}&app_key=${nutritionKey}&nutrition-type=cooking&ingr=${ingredient}-${weight}g`);
+                    const data = await response.json();
+                    console.log(data);
+                });
             });
         });
-    }
+    });
+}
+
+export function getNutritionalInformation(recipe) {
+    let ingredientObj = {};
     
-    export function getNutritionalInformation(recipe) {
-        let ingredientObj = {};
-        
-        recipe.ingredients.forEach(ingredient => {
-            ingredientObj[ingredient.food] = ingredient.weight;
-        });
-        
-        return ingredientObj;
-    }
+    recipe.ingredients.forEach(ingredient => {
+        ingredientObj[ingredient.food] = ingredient.weight;
+    });
+    
+    return ingredientObj;
+}
     
 
 export function createNutritionObject(recipe) {
