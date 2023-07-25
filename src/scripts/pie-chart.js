@@ -1,4 +1,12 @@
 export function drawPieChart(svg, data, width, height, nutrientObj) {
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", 10)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .text("Macronutrient Breakdown");
+    
     var radius = Math.min(width, height) / 2;
 
     var color = d3.scaleOrdinal()
@@ -28,5 +36,5 @@ export function drawPieChart(svg, data, width, height, nutrientObj) {
         .attr("transform", d => "translate(" + arc.centroid(d) + ")")
         .attr("dy", ".35em")
         .style("text-anchor", "middle")
-        .text(d => d.data.name + ': ' + d.data.value.toFixed(2) + ' g');
+        .text(d => d.data.name + ': ' + parseFloat(d.data.value).toFixed(0) + ' g');
 }

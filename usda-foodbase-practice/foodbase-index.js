@@ -1,5 +1,5 @@
-import { drawBarChart } from './bar-chart.js';
-import { drawPieChart } from './pie-chart.js';
+import { drawBarChart } from '../src/scripts/bar-chart.js';
+import { drawPieChart } from '../src/scripts/pie-chart.js';
 import * as nutrientFunctions from './nutrient-functions.js'
 
 const apiKey = 'UbpcAswEuzbbCwPhKaJdUxIkeAMUean4rUUDq9ij'

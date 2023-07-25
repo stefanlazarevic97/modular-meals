@@ -1,3 +1,7 @@
+import { drawPieChart } from "./pie-chart.js";
+import { drawBarChart } from "./bar-chart.js";
+import { capitalizeFirstLetter } from "./util.js";
+
 const usdaApiKey = 'UbpcAswEuzbbCwPhKaJdUxIkeAMUean4rUUDq9ij';
 const searchResultDiv = document.querySelector('.search-result');
 
@@ -43,20 +47,72 @@ export function generateHTML(results) {
             console.log(ingredientObj);
             const nutritionObj = createNutritionObject(selectedRecipe);
             console.log(nutritionObj);
+            var nutritionDiv = document.querySelector('.nutrition');
+            searchResultDiv.innerHTML = '';
+            var searchForm = document.querySelector('.search-form');
+            searchForm.innerHTML = '';
+            var ingredientsDiv = document.querySelector('.ingredients-list');
+            ingredientsDiv.innerHTML = '';
+        
+            let tableHTML = `
+                <table>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Weight (g)</th>
+                    </tr>
+                `;
+
+            Object.entries(ingredientObj).forEach(([ingredient, weight]) => {
+                tableHTML += `
+                    <tr>
+                        <td>${capitalizeFirstLetter(ingredient)}</td>
+                        <td>${Math.floor(weight)}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `</table>`;
+
+            ingredientsDiv.innerHTML = tableHTML;
+
+            var caloriesDiv = document.createElement('h2');
+            caloriesDiv.innerHTML = `Total Calories: ${nutritionObj.Calories}`;
+            nutritionDiv.append(caloriesDiv);
+
+            const nutrientsData = Object.keys(nutritionObj).map(key => ({ name: key, value: nutritionObj[key] }));
+            
+            const width = 500;
+            const height = 500;
+
+            var svgPie = d3.create("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            var macronutrients = ['Protein', 'Fat', 'Carbohydrates'];
+            drawPieChart(svgPie, macronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
+            nutritionDiv.append(svgPie.node());
+                        
+            var svgBar = d3.create("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+            var micronutrients = ['Cholesterol', 'Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Iron', 'Zinc', 'VitaminA', 'VitaminE', 'VitaminC', 'VitaminB6', 'VitaminB12', 'VitaminD', 'VitaminK'];
+            drawBarChart(svgBar, micronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
+            nutritionDiv.append(svgBar.node());
+            });
         });
-    });
-}
-
-export function getNutritionalInformation(recipe) {
-    let ingredientObj = {};
-
-    recipe.ingredients.forEach(ingredient => {
-        ingredientObj[ingredient.food] = ingredient.weight;
-    });
-
-    return ingredientObj;
-}
-
+    }
+    
+    export function getNutritionalInformation(recipe) {
+        let ingredientObj = {};
+        
+        recipe.ingredients.forEach(ingredient => {
+            ingredientObj[ingredient.food] = ingredient.weight;
+        });
+        
+        return ingredientObj;
+    }
+    
 
 export function createNutritionObject(recipe) {
     let servings = recipe.yield;
@@ -80,27 +136,27 @@ export function createNutritionObject(recipe) {
     };
 
     return {
-        'Calories': (recipe.calories / servings).toFixed(2),
-        'Protein': (recipe.totalNutrients.PROCNT.quantity / servings).toFixed(2),
-        'Fat': (recipe.totalNutrients.FAT.quantity / servings).toFixed(2),
-        'Saturated Fat': (recipe.totalNutrients.FASAT.quantity / servings).toFixed(2),
-        'Trans Fat': (recipe.totalNutrients.FATRN.quantity / servings).toFixed(2),
-        'Carbohydrates': (recipe.totalNutrients.CHOCDF.quantity / servings).toFixed(2),
-        'Sugar': (recipe.totalNutrients.SUGAR.quantity / servings).toFixed(2),
-        'Fiber': (recipe.totalNutrients.FIBTG.quantity / servings).toFixed(2),
-        'Cholesterol': ((recipe.totalNutrients.CHOLE.quantity / RDI.Cholesterol / servings) * 100).toFixed(2),
-        'Sodium': ((recipe.totalNutrients.NA.quantity / RDI.Sodium / servings) * 100).toFixed(2),
-        'Potassium': ((recipe.totalNutrients.K.quantity / RDI.Potassium / servings) * 100).toFixed(2),
-        'Magnesium': ((recipe.totalNutrients.MG.quantity / RDI.Magnesium / servings) * 100).toFixed(2),
-        'Vitamin A': ((recipe.totalNutrients.VITA_RAE.quantity / RDI.VitaminA / servings) * 100).toFixed(2),
-        'Vitamin E': ((recipe.totalNutrients.TOCPHA.quantity / RDI.VitaminE / servings) * 100).toFixed(2),
-        'Vitamin C': ((recipe.totalNutrients.VITC.quantity / RDI.VitaminC / servings) * 100).toFixed(2),
-        'Vitamin B6': ((recipe.totalNutrients.VITB6A.quantity / RDI.VitaminB6 / servings) * 100).toFixed(2),
-        'Vitamin B12': ((recipe.totalNutrients.VITB12.quantity / RDI.VitaminB12 / servings) * 100).toFixed(2),
-        'Vitamin D': ((recipe.totalNutrients.VITD.quantity / RDI.VitaminD / servings) * 100).toFixed(2),
-        'Vitamin K': ((recipe.totalNutrients.VITK1.quantity / RDI.VitaminK / servings) * 100).toFixed(2),
-        'Calcium': ((recipe.totalNutrients.CA.quantity / RDI.Calcium / servings) * 100).toFixed(2),
-        'Iron': ((recipe.totalNutrients.FE.quantity / RDI.Iron / servings) * 100).toFixed(2),
-        'Zinc': ((recipe.totalNutrients.ZN.quantity / RDI.Zinc / servings) * 100).toFixed(2)
+        'Calories': (recipe.calories / servings).toFixed(0),
+        'Protein': (recipe.totalNutrients.PROCNT.quantity / servings).toFixed(0),
+        'Fat': (recipe.totalNutrients.FAT.quantity / servings).toFixed(0),
+        'Saturated Fat': (recipe.totalNutrients.FASAT.quantity / servings).toFixed(0),
+        'Trans Fat': (recipe.totalNutrients.FATRN.quantity / servings).toFixed(0),
+        'Carbohydrates': (recipe.totalNutrients.CHOCDF.quantity / servings).toFixed(0),
+        'Sugar': (recipe.totalNutrients.SUGAR.quantity / servings).toFixed(0),
+        'Fiber': (recipe.totalNutrients.FIBTG.quantity / servings).toFixed(0),
+        'Cholesterol': ((recipe.totalNutrients.CHOLE.quantity / RDI.Cholesterol / servings) * 100).toFixed(0),
+        'Sodium': ((recipe.totalNutrients.NA.quantity / RDI.Sodium / servings) * 100).toFixed(0),
+        'Potassium': ((recipe.totalNutrients.K.quantity / RDI.Potassium / servings) * 100).toFixed(0),
+        'Magnesium': ((recipe.totalNutrients.MG.quantity / RDI.Magnesium / servings) * 100).toFixed(0),
+        'Vitamin A': ((recipe.totalNutrients.VITA_RAE.quantity / RDI.VitaminA / servings) * 100).toFixed(0),
+        'Vitamin E': ((recipe.totalNutrients.TOCPHA.quantity / RDI.VitaminE / servings) * 100).toFixed(0),
+        'Vitamin C': ((recipe.totalNutrients.VITC.quantity / RDI.VitaminC / servings) * 100).toFixed(0),
+        'Vitamin B6': ((recipe.totalNutrients.VITB6A.quantity / RDI.VitaminB6 / servings) * 100).toFixed(0),
+        'Vitamin B12': ((recipe.totalNutrients.VITB12.quantity / RDI.VitaminB12 / servings) * 100).toFixed(0),
+        'Vitamin D': ((recipe.totalNutrients.VITD.quantity / RDI.VitaminD / servings) * 100).toFixed(0),
+        'Vitamin K': ((recipe.totalNutrients.VITK1.quantity / RDI.VitaminK / servings) * 100).toFixed(0),
+        'Calcium': ((recipe.totalNutrients.CA.quantity / RDI.Calcium / servings) * 100).toFixed(0),
+        'Iron': ((recipe.totalNutrients.FE.quantity / RDI.Iron / servings) * 100).toFixed(0),
+        'Zinc': ((recipe.totalNutrients.ZN.quantity / RDI.Zinc / servings) * 100).toFixed(0)
     };
 }
