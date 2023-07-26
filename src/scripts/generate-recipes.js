@@ -21,14 +21,14 @@ export function generateHTML(results) {
 
         newHTML += `
             <div class="item">
-                <img src="${result.recipe.image}" alt="">
+                <img src="${result.recipe.image}" alt="${result.recipe.label}">
 
                 <div class="flex-container">
                     <h1 class="title">${result.recipe.label}</h1>
                     <a class="view-recipe-button" href="${result.recipe.url}" target="_blank">View Recipe</a>
                     <button class="modify-recipe-button" data-recipe-id="${index}">Modify Recipe</button>
                 </div>
-                    
+
                 <p class="item-data">
                     <strong>Calories/Serving:</strong> ${caloriesPerServing}
                 </p>
@@ -40,7 +40,6 @@ export function generateHTML(results) {
                 </p>
             </div>
         `;
-
     });
     
     const oldButton = document.querySelector('.find-more-recipes-button');

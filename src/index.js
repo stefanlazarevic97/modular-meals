@@ -58,9 +58,9 @@ export async function fetchAPI(searchParams, append) {
     const data = await response.json();
 
     if (append) {
-        recipes = recipes.concat(data.hits.filter(recipe => recipe.recipe.image)); // Only include recipes with valid images
+        recipes = recipes.concat(data.hits.filter(recipe => recipe.recipe.image));
     } else {
-        recipes = data.hits.filter(recipe => recipe.recipe.image); // Only include recipes with valid images
+        recipes = data.hits.filter(recipe => recipe.recipe.image);
     }
 
     generate.generateHTML(data.hits);
