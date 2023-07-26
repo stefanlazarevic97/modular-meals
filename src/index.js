@@ -4,15 +4,16 @@ import { getSearchParams } from "./scripts/search-params.js";
 const searchForm = document.querySelector('.search-form');
 const appId = '9571bf1b';
 const appKey = 'fd421218cb6bedd9fe774a93dd05e16e';
+export let lastSearchParams;
 export let recipes = [];
 
 searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    let searchParams = getSearchParams(e.target);
-    fetchAPI(searchParams);
+    lastSearchParams = getSearchParams(e.target);
+    fetchAPI(lastSearchParams, false);
 })
 
-async function fetchAPI(searchParams) {
+export async function fetchAPI(searchParams, append) {
     let queryParameters = {
         q: searchParams.searchQuery.length > 0 ? searchParams.searchQuery : undefined,
         time: searchParams.minTime && searchParams.maxTime ? `${searchParams.minTime}-${searchParams.maxTime}`
@@ -41,8 +42,6 @@ async function fetchAPI(searchParams) {
         excluded: searchParams.excludedIngredients.length > 0 ? searchParams.excludedIngredients : undefined
     }
 
-    // let baseURL = `http://localhost:5001?url=https://api.edamam.com/api/recipes/v2&type=public&app_id=${appId}&app_key=${appKey}&random=true`;
-
     let searchURL = Object.keys(queryParameters)
         .filter(key => queryParameters[key] !== undefined)
         .flatMap(key => {
@@ -57,7 +56,13 @@ async function fetchAPI(searchParams) {
     let fullURL = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${appId}&app_key=${appKey}&random=true&${searchURL}`;
     const response = await fetch(fullURL);
     const data = await response.json();
-    recipes = data.hits; 
+
+    if (append) {
+        recipes = recipes.concat(data.hits.filter(recipe => recipe.recipe.image)); // Only include recipes with valid images
+    } else {
+        recipes = data.hits.filter(recipe => recipe.recipe.image); // Only include recipes with valid images
+    }
+
     generate.generateHTML(data.hits);
-    console.log(data);
 }
+

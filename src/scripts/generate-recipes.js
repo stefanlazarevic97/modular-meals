@@ -1,6 +1,10 @@
 import { drawPieChart } from "./pie-chart.js";
 import { drawBarChart } from "./bar-chart.js";
 import { capitalizeFirstLetter } from "./util.js";
+import * as maps from "./maps.js";
+import * as nutrition from "./nutrition.js";
+import { fetchAPI } from "../index.js";
+import { lastSearchParams } from "../index.js";
 
 const nutritionId = '0cc0aea0';
 const nutritionKey = '1e077dc53566f535c8e43010f6e729d5';
@@ -26,28 +30,48 @@ export function generateHTML(results) {
                 </div>
                     
                 <p class="item-data">
-                    Calories Per Serving: ${caloriesPerServing}
+                    <strong>Calories/Serving:</strong> ${caloriesPerServing}
                 </p>
                 <p class="item-data">
-                    Macronutrients Per Serving: ${carbsPerServing}g carbohydrates, ${proteinPerServing}g protein, ${fatPerServing}g fat
+                    <strong>Macronutrients/Serving:</strong> ${carbsPerServing}g carbohydrates, ${proteinPerServing}g protein, ${fatPerServing}g fat
                 </p>
                 <p class="item-data">
-                    Servings: ${result.recipe.yield.toFixed(0)}
+                    <strong>Servings:</strong> ${result.recipe.yield.toFixed(0)}
                 </p>
             </div>
         `;
-    });
 
+    });
+    
+    const oldButton = document.querySelector('.find-more-recipes-button');
+    if (oldButton) {
+        oldButton.remove();
+    }
+
+    newHTML += `
+    <button class="find-more-recipes-button">Find More Recipes</button>
+    `;
+    
     searchResultDiv.innerHTML = newHTML;
+
+    document.querySelector('.find-more-recipes-button').addEventListener('click', () => fetchAPI(lastSearchParams, true));
+    document.querySelector('.search-form').style.display = 'none';
+    document.querySelector('.back-to-search').style.display = 'block';
+    searchResultDiv.style.display = 'block';
+
+    document.querySelector('.back-to-search').addEventListener('click', () => {
+        document.querySelector('.search-form').style.display = 'block';
+        document.querySelector('.back-to-search').style.display = 'none';
+        searchResultDiv.style.display = 'none';
+        searchResultDiv.innerHTML = '';
+    });
 
     document.querySelectorAll('.modify-recipe-button').forEach((button) => {
         button.addEventListener('click', async (event) => {
             const recipeId = event.target.dataset.recipeId;
             const selectedRecipe = results[recipeId].recipe;
-            const ingredientObj = getNutritionalInformation(selectedRecipe);
-            console.log(ingredientObj);
-            const nutritionObj = createNutritionObject(selectedRecipe);
-            console.log(nutritionObj);
+            let ingredientObj = nutrition.getNutritionalInformation(selectedRecipe);
+            let nutritionObj = nutrition.createNutritionObject(selectedRecipe, maps.RDI);
             var nutritionDiv = document.querySelector('.nutrition');
             searchResultDiv.innerHTML = '';
             var searchForm = document.querySelector('.search-form');
@@ -70,8 +94,7 @@ export function generateHTML(results) {
                         <td>${capitalizeFirstLetter(ingredient)}</td>
                         <td>${Math.floor(weight)}</td>
                         <td>
-                            <button class="remove-button">Remove</button>
-                            <button class="modify-button">Modify Quantity</button>
+                            <button class="remove-button">Remove Ingredient</button>
                         </td>
                     </tr>
                 `;
@@ -79,7 +102,11 @@ export function generateHTML(results) {
 
             tableHTML += `
                 </table>
-                <button class="add-button">Add Ingredient</button>
+                <div class="add-ingredient-div">
+                    <input type="text" id="ingredient-input" placeholder="Enter ingredient">
+                    <input type="number" id="weight-input" placeholder="Enter weight in grams">
+                    <button class="add-button">Add Ingredient</button>
+                </div>
             `;
 
             ingredientsDiv.innerHTML = tableHTML;
@@ -94,7 +121,7 @@ export function generateHTML(results) {
             const width = 500;
             const height = 500;
 
-            var svgPie = d3.create("svg")
+            let svgPie = d3.create("svg")
                 .attr("width", width)
                 .attr("height", height);
 
@@ -102,7 +129,7 @@ export function generateHTML(results) {
             drawPieChart(svgPie, macronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
             nutritionDiv.append(svgPie.node());
                         
-            var svgBar = d3.create("svg")
+            let svgBar = d3.create("svg")
             .attr("width", width)
             .attr("height", height);
 
@@ -116,67 +143,74 @@ export function generateHTML(results) {
                     const weight = e.target.parentElement.parentElement.children[1].textContent;
                     const response = await fetch(`https://api.edamam.com/api/nutrition-data?app_id=${nutritionId}&app_key=${nutritionKey}&nutrition-type=cooking&ingr=${ingredient}-${weight}g`);
                     const data = await response.json();
-                    console.log(data);
+                    nutritionObj = nutrition.subtractNutrition(nutritionObj, data, maps.RDI, selectedRecipe.yield);
+                    caloriesDiv.innerHTML = `Total Calories: ${nutritionObj.Calories}`;
+
+                    svgPie.selectAll("*").remove();
+                    drawPieChart(svgPie, macronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
+
+                    svgBar.selectAll("*").remove();
+                    drawBarChart(svgBar, micronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
+
+                    e.target.parentElement.parentElement.remove();
+                });
+            });
+
+            document.querySelector('.add-button').addEventListener('click', async () => {
+                const ingredientInput = document.querySelector('#ingredient-input').value;
+                const weightInput = document.querySelector('#weight-input').value;
+
+                if (!ingredientInput || !weightInput) {
+                    alert("Please fill both ingredient and weight fields.");
+                    return;
+                }
+
+                const response = await fetch(`https://api.edamam.com/api/nutrition-data?app_id=${nutritionId}&app_key=${nutritionKey}&nutrition-type=cooking&ingr=${ingredientInput}-${weightInput}g`);
+                const data = await response.json();
+
+                nutritionObj = nutrition.addNutrition(nutritionObj, data, maps.RDI, selectedRecipe.yield);
+
+                const newTableRow = document.createElement('tr');
+                
+                newTableRow.innerHTML = `
+                    <td>${capitalizeFirstLetter(ingredientInput)}</td>
+                    <td>${Math.floor(weightInput)}</td>
+                    <td>
+                        <button class="remove-button">Remove Ingredient</button>
+                    </td>
+                `;
+
+                document.querySelector('table').appendChild(newTableRow);
+
+                caloriesDiv.innerHTML = `Total Calories: ${nutritionObj.Calories}`;
+
+                svgPie.selectAll("*").remove();
+                drawPieChart(svgPie, macronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
+
+                svgBar.selectAll("*").remove();
+                drawBarChart(svgBar, micronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
+
+                document.querySelectorAll('.remove-button').forEach(button => {
+                    button.addEventListener('click', async function (e) {
+                        const ingredient = e.target.parentElement.parentElement.children[0].textContent;
+                        const weight = e.target.parentElement.parentElement.children[1].textContent;
+                        const response = await fetch(`https://api.edamam.com/api/nutrition-data?app_id=${nutritionId}&app_key=${nutritionKey}&nutrition-type=cooking&ingr=${ingredient}-${weight}g`);
+                        const data = await response.json();
+
+                        nutritionObj = nutrition.subtractNutrition(nutritionObj, data, maps.RDI, selectedRecipe.yield);
+
+                        caloriesDiv.innerHTML = `Total Calories: ${nutritionObj.Calories}`;
+
+                        svgPie.selectAll("*").remove();
+                        drawPieChart(svgPie, macronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
+
+                        svgBar.selectAll("*").remove();
+                        drawBarChart(svgBar, micronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
+
+                        e.target.parentElement.parentElement.remove();
+                    });
                 });
             });
         });
     });
-}
-
-export function getNutritionalInformation(recipe) {
-    let ingredientObj = {};
-    
-    recipe.ingredients.forEach(ingredient => {
-        ingredientObj[ingredient.food] = ingredient.weight;
-    });
-    
-    return ingredientObj;
-}
-    
-
-export function createNutritionObject(recipe) {
-    let servings = recipe.yield;
-
-    // recommended daily intake for micronutrients
-    const RDI = {
-        'Cholesterol': 300,
-        'Sodium': 2300,
-        'Potassium': 4700,
-        'Magnesium': 420,
-        'Calcium': 1000,
-        'Iron': 18,
-        'Zinc': 11,
-        'VitaminA': 900,
-        'VitaminE': 15,
-        'VitaminC': 90,
-        'VitaminB6': 1.7,
-        'VitaminB12': 2.4,
-        'VitaminD': 20,
-        'VitaminK': 120
-    };
-
-    return {
-        'Calories': (recipe.calories / servings).toFixed(0),
-        'Protein': (recipe.totalNutrients.PROCNT.quantity / servings).toFixed(0),
-        'Fat': (recipe.totalNutrients.FAT.quantity / servings).toFixed(0),
-        'Saturated Fat': (recipe.totalNutrients.FASAT.quantity / servings).toFixed(0),
-        'Trans Fat': (recipe.totalNutrients.FATRN.quantity / servings).toFixed(0),
-        'Carbohydrates': (recipe.totalNutrients.CHOCDF.quantity / servings).toFixed(0),
-        'Sugar': (recipe.totalNutrients.SUGAR.quantity / servings).toFixed(0),
-        'Fiber': (recipe.totalNutrients.FIBTG.quantity / servings).toFixed(0),
-        'Cholesterol': ((recipe.totalNutrients.CHOLE.quantity / RDI.Cholesterol / servings) * 100).toFixed(0),
-        'Sodium': ((recipe.totalNutrients.NA.quantity / RDI.Sodium / servings) * 100).toFixed(0),
-        'Potassium': ((recipe.totalNutrients.K.quantity / RDI.Potassium / servings) * 100).toFixed(0),
-        'Magnesium': ((recipe.totalNutrients.MG.quantity / RDI.Magnesium / servings) * 100).toFixed(0),
-        'Vitamin A': ((recipe.totalNutrients.VITA_RAE.quantity / RDI.VitaminA / servings) * 100).toFixed(0),
-        'Vitamin E': ((recipe.totalNutrients.TOCPHA.quantity / RDI.VitaminE / servings) * 100).toFixed(0),
-        'Vitamin C': ((recipe.totalNutrients.VITC.quantity / RDI.VitaminC / servings) * 100).toFixed(0),
-        'Vitamin B6': ((recipe.totalNutrients.VITB6A.quantity / RDI.VitaminB6 / servings) * 100).toFixed(0),
-        'Vitamin B12': ((recipe.totalNutrients.VITB12.quantity / RDI.VitaminB12 / servings) * 100).toFixed(0),
-        'Vitamin D': ((recipe.totalNutrients.VITD.quantity / RDI.VitaminD / servings) * 100).toFixed(0),
-        'Vitamin K': ((recipe.totalNutrients.VITK1.quantity / RDI.VitaminK / servings) * 100).toFixed(0),
-        'Calcium': ((recipe.totalNutrients.CA.quantity / RDI.Calcium / servings) * 100).toFixed(0),
-        'Iron': ((recipe.totalNutrients.FE.quantity / RDI.Iron / servings) * 100).toFixed(0),
-        'Zinc': ((recipe.totalNutrients.ZN.quantity / RDI.Zinc / servings) * 100).toFixed(0)
-    };
 }
