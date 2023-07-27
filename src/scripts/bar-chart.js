@@ -4,10 +4,9 @@ export function drawBarChart(svg, data, width, height) {
         .attr("y", 20)
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
-        .style("font-weight", "bold")
-        .text("Micronutrient Breakdown");
-    
-    var margin = { top: 20, right: 20, bottom: 50, left: 60 },
+        .style("font-weight", "bold");
+
+    var margin = { top: 20, right: 20, bottom: 70, left: 60 },  // increase bottom margin to accommodate tilted labels
         width = width - margin.left - margin.right,
         height = height - margin.top - margin.bottom;
 
@@ -30,8 +29,8 @@ export function drawBarChart(svg, data, width, height) {
         .append("text")
         .attr("fill", "#000")
         .attr("transform", "rotate(-90)")
-        .attr("y", -margin.left + 10) // move y-axis label outside the axis
-        .attr("dy", "1em") // center y-axis label
+        .attr("y", -margin.left + 10)
+        .attr("dy", "1em")
         .attr("text-anchor", "end")
         .style("font-weight", "bold")
         .text("% of recommended daily intake");
@@ -39,22 +38,23 @@ export function drawBarChart(svg, data, width, height) {
     g.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x))
-        .append("text")
-        .attr("fill", "#000")
-        .attr("x", width / 2) // center x-axis label
-        .attr("y", margin.bottom) // position x-axis label
-        .attr("dy", "-1em") // offset x-axis label
-        .attr("text-anchor", "middle")
-        .style("font-weight", "bold")
-        .text("Micronutrients"); // add x-axis label
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-45)");
 
     g.selectAll(".bar")
         .data(data)
         .enter().append("rect")
         .attr("class", "bar")
         .attr("x", d => x(d.name))
-        .attr("y", d => y(parseFloat(d.value)))
+        .attr("y", height)
         .attr("width", x.bandwidth())
-        .attr("height", d => height - y(parseFloat(d.value)))
-        .attr("fill", "hsl(173, 90%, 15%)"); 
+        .attr("height", 0)
+        .attr("fill", "hsl(173, 90%, 15%)")
+        .transition()
+        .duration(1000)
+        .attr("y", d => y(parseFloat(d.value)))
+        .attr("height", d => height - y(parseFloat(d.value)));
 }

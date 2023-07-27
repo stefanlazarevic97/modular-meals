@@ -12,6 +12,12 @@ const searchResultDiv = document.querySelector('.search-result');
 
 export function generateHTML(results) {
     let newHTML = '';
+    
+    newHTML += `
+        <button class="find-more-recipes-button">
+            <ion-icon class="refresh-icon" name="refresh-outline"></ion-icon>
+        </button>
+    `;
 
     results.map((result, index) => {
         const caloriesPerServing = (result.recipe.calories / result.recipe.yield).toFixed(0);
@@ -19,6 +25,7 @@ export function generateHTML(results) {
         const proteinPerServing = (result.recipe.totalNutrients.PROCNT.quantity / result.recipe.yield).toFixed(0);
         const fatPerServing = (result.recipe.totalNutrients.FAT.quantity / result.recipe.yield).toFixed(0);
 
+       
         newHTML += `
             <div class="item">
                 <img src="${result.recipe.image}" alt="${result.recipe.label}">
@@ -47,16 +54,11 @@ export function generateHTML(results) {
         oldButton.remove();
     }
 
-    newHTML += `
-    <button class="find-more-recipes-button">Find More Recipes</button>
-    `;
-    
     searchResultDiv.innerHTML = newHTML;
 
     document.querySelector('.find-more-recipes-button').addEventListener('click', () => fetchAPI(lastSearchParams, true));
     document.querySelector('.search-form').style.display = 'none';
     document.querySelector('.back-to-search').style.display = 'block';
-    searchResultDiv.style.display = 'block';
 
     document.querySelector('.back-to-search').addEventListener('click', () => {
         document.querySelector('.search-form').style.display = 'block';
@@ -71,12 +73,25 @@ export function generateHTML(results) {
             const selectedRecipe = results[recipeId].recipe;
             let ingredientObj = nutrition.getNutritionalInformation(selectedRecipe);
             let nutritionObj = nutrition.createNutritionObject(selectedRecipe, maps.RDI);
-            var nutritionDiv = document.querySelector('.nutrition');
+            // console.log(nutritionObj);
+            var pieChartDiv = document.querySelector('.pie-chart');
+            var barChartDiv = document.querySelector('.bar-chart');   
+            var caloriesDiv = document.querySelector('.calories');         
             searchResultDiv.innerHTML = '';
             var searchForm = document.querySelector('.search-form');
             searchForm.innerHTML = '';
             var ingredientsDiv = document.querySelector('.ingredients-list');
             ingredientsDiv.innerHTML = '';
+            document.querySelector('.pie-chart').style.display = 'block';
+            document.querySelector('.bar-chart').style.display = 'block';
+            searchResultDiv.style.display = 'none';
+
+            // document.querySelector('.back-to-search').addEventListener('click', () => {
+            //     document.querySelector('.search-form').style.display = 'block';
+            //     document.querySelector('.recipe-data').style.display = 'none';
+            //     searchResultDiv.style.display = 'none';
+            //     searchResultDiv.innerHTML = '';
+            // });
 
             let tableHTML = `
                 <table>
@@ -102,8 +117,8 @@ export function generateHTML(results) {
             tableHTML += `
                 </table>
                 <div class="add-ingredient-div">
-                    <input type="text" id="ingredient-input" placeholder="Enter ingredient">
-                    <input type="number" id="weight-input" placeholder="Enter weight in grams">
+                    <input type="text" class="ingredient-input" placeholder="Enter ingredient">
+                    <input type="number" class="weight-input" placeholder="Enter weight in grams">
                     <button class="add-button">Add Ingredient</button>
                 </div>
             `;
@@ -113,12 +128,11 @@ export function generateHTML(results) {
 
             var caloriesDiv = document.createElement('h2');
             caloriesDiv.innerHTML = `Total Calories: ${nutritionObj.Calories}`;
-            nutritionDiv.append(caloriesDiv);
 
             const nutrientsData = Object.keys(nutritionObj).map(key => ({ name: key, value: nutritionObj[key] }));
             
-            const width = 500;
-            const height = 500;
+            const width = 300;
+            const height = 300;
 
             let svgPie = d3.create("svg")
                 .attr("width", width)
@@ -126,7 +140,7 @@ export function generateHTML(results) {
 
             var macronutrients = ['Protein', 'Fat', 'Carbohydrates'];
             drawPieChart(svgPie, macronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
-            nutritionDiv.append(svgPie.node());
+            pieChartDiv.append(svgPie.node());
                         
             let svgBar = d3.create("svg")
             .attr("width", width)
@@ -134,7 +148,7 @@ export function generateHTML(results) {
 
             var micronutrients = ['Cholesterol', 'Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Iron', 'Zinc', 'VitaminA', 'VitaminE', 'VitaminC', 'VitaminB6', 'VitaminB12', 'VitaminD', 'VitaminK'];
             drawBarChart(svgBar, micronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
-            nutritionDiv.append(svgBar.node());
+            barChartDiv.append(svgBar.node());
 
             document.querySelectorAll('.remove-button').forEach(button => {
                 button.addEventListener('click', async function (e) {
@@ -156,8 +170,8 @@ export function generateHTML(results) {
             });
 
             document.querySelector('.add-button').addEventListener('click', async () => {
-                const ingredientInput = document.querySelector('#ingredient-input').value;
-                const weightInput = document.querySelector('#weight-input').value;
+                const ingredientInput = document.querySelector('.ingredient-input').value;
+                const weightInput = document.querySelector('.weight-input').value;
 
                 if (!ingredientInput || !weightInput) {
                     alert("Please fill both ingredient and weight fields.");

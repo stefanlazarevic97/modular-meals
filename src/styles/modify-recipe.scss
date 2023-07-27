@@ -1,0 +1,87 @@
+table {
+    width: 100%;
+}
+
+th,
+td {
+    text-align: center;
+    padding: 4px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.remove-button,
+.add-button,
+.back-to-search {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.remove-button:hover,
+.add-button:hover,
+.back-to-search:hover {
+    background-color: #0056b3;
+}
+
+.ingredient-input,
+.weight-input {
+    width: 35%;
+    padding: 10px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+svg {
+    width: 100%;
+    height: auto;
+}
+
+.add-ingredient-div {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.back-to-search {
+    display: block;
+    margin-top: 30px;
+}
+
+.charts {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
+}
+
+.bar-chart, .pie-chart {
+    font-weight: bold;
+}
+
+.recipe-data {
+    width: 700px;
+    margin: auto;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
