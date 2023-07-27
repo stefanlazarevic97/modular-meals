@@ -22,6 +22,7 @@
     max-width: 100%;
     height: auto;
     margin-bottom: 15px;
+    border-radius: 5px;
 }
 
 .recipe-info {
@@ -68,7 +69,6 @@
 
 .item-data {
     width: 100%;
-    border-top: 1px solid #EAF5F2;
     padding-top: 10px;
     margin-top: 10px;
 }
@@ -77,6 +77,16 @@
 .item-data td {
     text-align: left;
     padding: 5px;
+    border: none;
+}
+
+.item-data th {
+    border-bottom: 3px solid #EAF5F2;
+    text-align: center;
+}
+
+.item-data tr td:nth-child(2) {
+    text-align: right;
 }
 
 @media only screen and (max-width: 1200px) {
