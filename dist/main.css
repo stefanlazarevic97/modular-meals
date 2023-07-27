@@ -514,3 +514,72 @@ header .brand {
   top: 50%;
   transform: translateY(-50%);
 }
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  background-color: #EAF5F2;
+  margin: 15% auto;
+  padding: 20px;
+  padding-top: 10px;
+  border: 1px solid #458F77;
+  border-radius: 10px;
+  width: 60%;
+  line-height: 27.5px;
+}
+
+.close {
+  color: #244C3F;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  align-self: flex-end;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.header-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.instructions-button {
+  background-color: #244C3F;
+  border: none;
+  color: #EAF5F2;
+  padding: 5px 10px;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+  height: 30px;
+}
+
+.instructions-list {
+  margin-left: 40px;
+}

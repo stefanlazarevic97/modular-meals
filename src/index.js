@@ -73,3 +73,21 @@ const backButton = document.querySelector('.back-to-search');
 backButton.addEventListener('click', () => {
     location.reload();
 });
+
+var modal = document.querySelector(".modal");
+var btn = document.querySelector(".instructions-button");
+var span = document.getElementsByClassName("close")[0];
+
+btn.onclick = function () {
+    modal.style.display = "block";
+}
+
+span.onclick = function () {
+    modal.style.display = "none";
+}
+
+window.onclick = function (event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
