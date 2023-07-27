@@ -1,6 +1,8 @@
-# ModularMeals
+# [ModularMeals](https://stefanlazarevic97.github.io/modular-meals/)
 
-## [Live Application](https://stefanlazarevic97.github.io/modular-meals/)
+Empowering personalized culinary creativity with over 1.7 million recipes tailored to your dietary needs and preferences.
+
+## Description
 
 If you've found yourself pressed for time with just 45 minutes to prepare dinner, or tasked with crafting a high-protein, low-carb, dairy-free, vegetarian breakfast, our application is the ideal solution for you. Perhaps you're looking to dazzle your friends with a culinary masterpiece hailing from their homeland, or maybe you're facing the challenge of missing an essential ingredient from a recipe. Even if your ambition is to recreate healthier versions of your favourite comfort foods, or to cleverly utilise those extra ingredients lying idle in your pantry, this application will empower you in your gastronomical endeavours.
 
