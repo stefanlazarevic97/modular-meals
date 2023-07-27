@@ -60,20 +60,12 @@ export function generateHTML(results) {
     document.querySelector('.search-form').style.display = 'none';
     document.querySelector('.back-to-search').style.display = 'block';
 
-    document.querySelector('.back-to-search').addEventListener('click', () => {
-        document.querySelector('.search-form').style.display = 'block';
-        document.querySelector('.back-to-search').style.display = 'none';
-        searchResultDiv.style.display = 'none';
-        searchResultDiv.innerHTML = '';
-    });
-
     document.querySelectorAll('.modify-recipe-button').forEach((button) => {
         button.addEventListener('click', async (event) => {
             const recipeId = event.target.dataset.recipeId;
             const selectedRecipe = results[recipeId].recipe;
             let ingredientObj = nutrition.getNutritionalInformation(selectedRecipe);
             let nutritionObj = nutrition.createNutritionObject(selectedRecipe, maps.RDI);
-            // console.log(nutritionObj);
             var pieChartDiv = document.querySelector('.pie-chart');
             var barChartDiv = document.querySelector('.bar-chart');   
             var caloriesDiv = document.querySelector('.calories');         
@@ -85,13 +77,6 @@ export function generateHTML(results) {
             document.querySelector('.pie-chart').style.display = 'block';
             document.querySelector('.bar-chart').style.display = 'block';
             searchResultDiv.style.display = 'none';
-
-            // document.querySelector('.back-to-search').addEventListener('click', () => {
-            //     document.querySelector('.search-form').style.display = 'block';
-            //     document.querySelector('.recipe-data').style.display = 'none';
-            //     searchResultDiv.style.display = 'none';
-            //     searchResultDiv.innerHTML = '';
-            // });
 
             let tableHTML = `
                 <table>

@@ -66,3 +66,8 @@ export async function fetchAPI(searchParams, append) {
     generate.generateHTML(data.hits);
 }
 
+const backButton = document.querySelector('.back-to-search');
+
+backButton.addEventListener('click', () => {
+    location.reload();
+});
