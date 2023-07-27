@@ -1,5 +1,6 @@
 import * as generate from "./scripts/generate-recipes.js";
 import { getSearchParams } from "./scripts/search-params.js";
+import { capitalizeFirstLetter } from "./scripts/util.js";
 
 const searchForm = document.querySelector('.search-form');
 const appId = '9571bf1b';
@@ -36,9 +37,9 @@ export async function fetchAPI(searchParams, append) {
             : searchParams.minProtein ? `${searchParams.minProtein}+`
             : searchParams.maxProtein ? `${searchParams.maxProtein}`
             : undefined,
-        mealType: searchParams.mealType || undefined,
-        cuisineType: searchParams.cuisineType ? searchParams.cuisineType.toLowerCase() : undefined,
         health: searchParams.dietRestrictions.length > 0 ? searchParams.dietRestrictions : undefined,
+        cuisineType: searchParams.cuisineType ? capitalizeFirstLetter(searchParams.cuisineType) : undefined,
+        mealType: searchParams.mealType || undefined,
         excluded: searchParams.excludedIngredients.length > 0 ? searchParams.excludedIngredients : undefined
     }
 
@@ -53,7 +54,8 @@ export async function fetchAPI(searchParams, append) {
         })
         .join('&');
 
-    let fullURL = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${appId}&app_key=${appKey}&random=true&${searchURL}`;
+    let fullURL = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${appId}&app_key=${appKey}&${searchURL}&random=true`;
+
     const response = await fetch(fullURL);
     const data = await response.json();
 
