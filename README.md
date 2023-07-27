@@ -1,5 +1,7 @@
 # [ModularMeals](https://stefanlazarevic97.github.io/modular-meals/)
 
+<div style="text-align: justify">
+
 Empowering personalized culinary creativity with over 1.7 million recipes tailored to your dietary needs and preferences.
 
 ## Description
@@ -31,3 +33,5 @@ To tailor the recipe to your exact specifications, you can also add or remove in
 </p>
 
 What's more, you can watch in real time as the nutritional profile of your meal adapts with each modification of ingredients. Discover the joy of customised culinary experiences with our application, designed with your unique needs in mind.
+
+</div>
