@@ -6,7 +6,7 @@ export function drawBarChart(svg, data, width, height) {
         .style("font-size", "16px")
         .style("font-weight", "bold");
 
-    var margin = { top: 20, right: 20, bottom: 70, left: 60 },  // increase bottom margin to accommodate tilted labels
+    var margin = { top: 20, right: 20, bottom: 70, left: 60 },
         width = width - margin.left - margin.right,
         height = height - margin.top - margin.bottom;
 

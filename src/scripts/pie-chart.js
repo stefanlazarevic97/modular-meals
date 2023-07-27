@@ -4,13 +4,14 @@ export function drawPieChart(svg, data, width, height, nutritionObj) {
         .attr("y", 10)
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
-        .style("font-weight", "bold");
+        .style("font-weight", "bold")
+        .style("fill", "#093527");
 
     var radius = Math.min(width, height) / 2;
 
     var color = d3.scaleOrdinal()
         .domain(data.map(d => d.name))
-        .range(d3.schemeSet3);
+        .range(["#7CC0AB", "#458F77", "#244C3F"]);
 
     var pie = d3.pie()
         .value(d => d.value)
@@ -49,7 +50,8 @@ export function drawPieChart(svg, data, width, height, nutritionObj) {
         var label = d3.select(this).append("text")
             .attr("transform", d => "translate(" + labelArc.centroid(d) + ")")
             .style("text-anchor", "middle")
-            .style("font-size", "12px");
+            .style("font-size", "12px")
+            .style("fill", d.data.name === 'Carbohydrates' ? "#EAF5F2" : "#093527");
         var name = d.data.name + ': ' + parseFloat(d.data.value).toFixed(0) + ' g',
             additional = [];
 
@@ -67,10 +69,15 @@ export function drawPieChart(svg, data, width, height, nutritionObj) {
             .text(name);
 
         additional.forEach(function (add, i) {
+            var addColor = "#093527";
+            if (d.data.name === 'Carbohydrates' && (add.includes('Fiber') || add.includes('Sugar'))) {
+                addColor = "#EAF5F2";
+            }
             label.append("tspan")
                 .attr("x", 0)
                 .attr("dy", "1.2em")
                 .style("font-weight", "normal")
+                .style("fill", addColor)
                 .text(add);
         });
     });

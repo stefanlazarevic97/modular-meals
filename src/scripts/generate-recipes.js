@@ -25,29 +25,49 @@ export function generateHTML(results) {
         const proteinPerServing = (result.recipe.totalNutrients.PROCNT.quantity / result.recipe.yield).toFixed(0);
         const fatPerServing = (result.recipe.totalNutrients.FAT.quantity / result.recipe.yield).toFixed(0);
 
-       
         newHTML += `
             <div class="item">
                 <img src="${result.recipe.image}" alt="${result.recipe.label}">
-
-                <div class="flex-container">
+                
+                <div class="recipe-info">
                     <h1 class="title">${result.recipe.label}</h1>
-                    <a class="view-recipe-button" href="${result.recipe.url}" target="_blank">View Recipe</a>
-                    <button class="modify-recipe-button" data-recipe-id="${index}">Modify Recipe</button>
+                    <div class="button-container">
+                        <a class="view-recipe-button" href="${result.recipe.url}" target="_blank">View Recipe</a>
+                        <button class="modify-recipe-button" data-recipe-id="${index}">Modify Recipe</button>
+                    </div>
+                    <div class="servings">Servings: ${result.recipe.yield.toFixed(0)}</div>
                 </div>
 
-                <p class="item-data">
-                    <strong>Calories/Serving:</strong> ${caloriesPerServing}
-                </p>
-                <p class="item-data">
-                    <strong>Macronutrients/Serving:</strong> ${carbsPerServing}g carbohydrates, ${proteinPerServing}g protein, ${fatPerServing}g fat
-                </p>
-                <p class="item-data">
-                    <strong>Servings:</strong> ${result.recipe.yield.toFixed(0)}
-                </p>
+                <table class="item-data">
+                    <thead>
+                        <tr>
+                            <th>Nutrient</th>
+                            <th>Value/Serving</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Calories</td>
+                            <td>${caloriesPerServing}</td>
+                        </tr>
+                        <tr>
+                            <td>Carbohydrates</td>
+                            <td>${carbsPerServing}g</td>
+                        </tr>
+                        <tr>
+                            <td>Protein</td>
+                            <td>${proteinPerServing}g</td>
+                        </tr>
+                        <tr>
+                            <td>Fat</td>
+                            <td>${fatPerServing}g</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         `;
-    });
+    })
+
     
     const oldButton = document.querySelector('.find-more-recipes-button');
     if (oldButton) {
@@ -58,27 +78,40 @@ export function generateHTML(results) {
 
     document.querySelector('.find-more-recipes-button').addEventListener('click', () => fetchAPI(lastSearchParams, true));
     document.querySelector('.search-form').style.display = 'none';
-    document.querySelector('.back-to-search').style.display = 'block';
-
+    document.querySelector('.back-to-search').classList.remove('hidden')
+    document.querySelector('.back-to-search').classList.add('visible');
+    document.querySelector('.back-to-search').removeAttribute('disabled');
+    
     document.querySelectorAll('.modify-recipe-button').forEach((button) => {
         button.addEventListener('click', async (event) => {
             const recipeId = event.target.dataset.recipeId;
             const selectedRecipe = results[recipeId].recipe;
-            let ingredientObj = nutrition.getNutritionalInformation(selectedRecipe);
-            let nutritionObj = nutrition.createNutritionObject(selectedRecipe, maps.RDI);
-            var pieChartDiv = document.querySelector('.pie-chart');
-            var barChartDiv = document.querySelector('.bar-chart');   
-            var caloriesDiv = document.querySelector('.calories');         
+
             searchResultDiv.innerHTML = '';
-            var searchForm = document.querySelector('.search-form');
-            searchForm.innerHTML = '';
-            var ingredientsDiv = document.querySelector('.ingredients-list');
-            ingredientsDiv.innerHTML = '';
-            document.querySelector('.pie-chart').style.display = 'block';
-            document.querySelector('.bar-chart').style.display = 'block';
             searchResultDiv.style.display = 'none';
 
+            var searchForm = document.querySelector('.search-form');
+            searchForm.innerHTML = '';
+
+            let ingredientObj = nutrition.getNutritionalInformation(selectedRecipe);
+            let nutritionObj = nutrition.createNutritionObject(selectedRecipe, maps.RDI);
+
+            var pieChartDiv = document.querySelector('.pie-chart');
+            var barChartDiv = document.querySelector('.bar-chart');   
+            document.querySelector('.pie-chart').style.display = 'block';
+            document.querySelector('.bar-chart').style.display = 'block';
+            
+            var ingredientsDiv = document.querySelector('.ingredients-list');
+            ingredientsDiv.innerHTML = '';
+            
+            var caloriesDiv = document.querySelector('.calories');         
+            caloriesDiv.innerHTML = `Calories per Serving: ${nutritionObj.Calories}`;
+            
             let tableHTML = `
+                <a class="view-selected-recipe-button" href="${selectedRecipe.url}" target="_blank">${selectedRecipe.label}</a>
+            `
+
+            tableHTML += `
                 <table>
                     <tr>
                         <th>Ingredient</th>
@@ -109,10 +142,6 @@ export function generateHTML(results) {
             `;
 
             ingredientsDiv.innerHTML = tableHTML;
-
-
-            var caloriesDiv = document.createElement('h2');
-            caloriesDiv.innerHTML = `Total Calories: ${nutritionObj.Calories}`;
 
             const nutrientsData = Object.keys(nutritionObj).map(key => ({ name: key, value: nutritionObj[key] }));
             
