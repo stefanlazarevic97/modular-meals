@@ -11,6 +11,20 @@ export let recipes = [];
 searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
     lastSearchParams = getSearchParams(e.target);
+
+    const fields = [
+        lastSearchParams.minTime, lastSearchParams.maxTime, lastSearchParams.minCalories,
+        lastSearchParams.maxCalories, lastSearchParams.minCarbs, lastSearchParams.maxCarbs,
+        lastSearchParams.minFat, lastSearchParams.maxFat, lastSearchParams.minProtein, lastSearchParams.maxProtein
+    ];
+
+    const hasNegativeValue = fields.some(value => value < 0);
+
+    if (hasNegativeValue) {
+        alert('Input fields cannot have negative values');
+        return;
+    }
+
     fetchAPI(lastSearchParams, false);
 })
 

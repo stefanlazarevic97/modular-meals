@@ -12,7 +12,7 @@ const searchResultDiv = document.querySelector('.search-result');
 
 export function generateHTML(results) {
     let newHTML = '';
-    
+
     newHTML += `
         <button class="find-more-recipes-button">
             <ion-icon class="refresh-icon" name="refresh-outline"></ion-icon>
@@ -78,10 +78,36 @@ export function generateHTML(results) {
 
     document.querySelector('.find-more-recipes-button').addEventListener('click', () => fetchAPI(lastSearchParams, true));
     document.querySelector('.search-form').style.display = 'none';
-    document.querySelector('.back-to-search').classList.remove('hidden')
+    document.querySelector('.back-to-search').classList.remove('hidden');
     document.querySelector('.back-to-search').classList.add('visible');
     document.querySelector('.back-to-search').removeAttribute('disabled');
     
+    if (results.length === 0) {
+        searchResultDiv.innerHTML = '<div class="no-results">There are no results that match your search.</div>';
+        searchResultDiv.style.display = 'flex';
+        searchResultDiv.style.justifyContent = 'center';
+        searchResultDiv.style.alignItems = 'center';
+        searchResultDiv.style.height = '50vh';
+        return;
+    }
+
+    searchResultDiv.removeAttribute('style'); 
+
+    function checkAndToggleCharts() {
+        const tableRows = document.querySelectorAll('table tr');
+        const caloriesDiv = document.querySelector('.calories');
+
+        if (tableRows.length <= 1) {
+            document.querySelector('.pie-chart').style.display = 'none';
+            document.querySelector('.bar-chart').style.display = 'none';
+            caloriesDiv.innerHTML = '';
+        } else {
+            document.querySelector('.pie-chart').style.display = 'block';
+            document.querySelector('.bar-chart').style.display = 'block';
+        }
+    }
+
+
     document.querySelectorAll('.modify-recipe-button').forEach((button) => {
         button.addEventListener('click', async (event) => {
             const recipeId = event.target.dataset.recipeId;
@@ -136,7 +162,7 @@ export function generateHTML(results) {
                 </table>
                 <div class="add-ingredient-div">
                     <input type="text" class="ingredient-input" placeholder="Enter ingredient">
-                    <input type="number" class="weight-input" placeholder="Enter weight in grams">
+                    <input type="number" class="weight-input" placeholder="Enter weight in grams" min="0">
                     <button class="add-button">Add Ingredient</button>
                 </div>
             `;
@@ -180,6 +206,7 @@ export function generateHTML(results) {
                     drawBarChart(svgBar, micronutrients.map(n => ({ name: n, value: nutritionObj[n] })), width, height, nutritionObj);
 
                     e.target.parentElement.parentElement.remove();
+                    checkAndToggleCharts();
                 });
             });
 
@@ -189,6 +216,11 @@ export function generateHTML(results) {
 
                 if (!ingredientInput || !weightInput) {
                     alert("Please fill both ingredient and weight fields.");
+                    return;
+                }
+
+                if (weightInput < 0) {
+                    alert("Weight cannot be negative.");
                     return;
                 }
 
@@ -208,7 +240,8 @@ export function generateHTML(results) {
                 `;
 
                 document.querySelector('table').appendChild(newTableRow);
-
+                checkAndToggleCharts();
+                
                 caloriesDiv.innerHTML = `Total Calories: ${nutritionObj.Calories}`;
 
                 svgPie.selectAll("*").remove();

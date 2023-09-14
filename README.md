@@ -31,3 +31,101 @@ To tailor the recipe to your exact specifications, you can also add or remove in
 </p>
 
 What's more, you can watch in real time as the nutritional profile of your meal adapts with each modification of ingredients. Discover the joy of customised culinary experiences with our application, designed with your unique needs in mind.
+
+## Code Snippets
+
+This function loops through the list of recipes (results) returned from the API. For each recipe, it calculates the calories per serving, generates dynamic HTML, embedding the recipe details (image, title, etc.) into the page.
+
+```javascript
+results.map((result, index) => {
+    const caloriesPerServing = (result.recipe.calories / result.recipe.yield).toFixed(0);
+    // ...
+    newHTML += `
+        <div class="item">
+            <img src="${result.recipe.image}" alt="${result.recipe.label}">
+            <div class="recipe-info">
+                <h1 class="title">${result.recipe.label}</h1>
+                <!-- ... -->
+            </div>
+            <!-- ... -->
+        </div>
+    `;
+})
+```
+
+This event listener listens for clicks on all the "Remove Ingredient" buttons, fetches the nutrition data for the ingredient that needs to be removed, and updates the nutrition object to remove the nutrient values of the removed ingredient.
+
+```javascript
+document.querySelectorAll('.remove-button').forEach(button => {
+    button.addEventListener('click', async function (e) {
+        const ingredient = e.target.parentElement.parentElement.children[0].textContent;
+        // ...
+        nutritionObj = nutrition.subtractNutrition(nutritionObj, data, maps.RDI, selectedRecipe.yield);
+        // ...
+    });
+});
+```
+
+This function checks if all ingredients are removed from the table. If so, it hides the pie chart and bar chart elements, and also removes the displayed calories.
+
+```javascript
+function checkAndToggleCharts() {
+    const tableRows = document.querySelectorAll('table tr');
+    const caloriesDiv = document.querySelector('.calories');
+
+    if (tableRows.length <= 1) {
+        document.querySelector('.pie-chart').style.display = 'none';
+        document.querySelector('.bar-chart').style.display = 'none';
+        caloriesDiv.innerHTML = '';
+    } else {
+        //...
+    }
+}
+```
+
+## Technologies Used
+
+**JavaScript DOM Manipulation**
+- Used extensively to dynamically generate and update HTML elements.
+- Responsible for creating recipe cards, adding and removing ingredients, and updating nutritional charts in real-time.
+
+**D3.js**
+- Data-Driven Documents (D3) is used for creating dynamic, interactive data visualizations.
+- In this application, D3 is used to render pie and bar charts that depict nutritional values of the selected recipes.
+
+**Edamam API**
+- The Edamam API is used for fetching recipe and nutrition data.
+- Features such as recipe search and getting detailed nutritional information are made possible through this API.
+
+**Fetch API**
+- Native JavaScript API for making HTTP requests.
+- Used to interact with the Edamam API to fetch recipes and nutritional data.
+
+**CSS and HTML**
+- HTML is used for structuring the application, while CSS provides the styling.
+- Both are essential for creating a user-friendly interface.
+
+**Async/Await Syntax**
+- Modern JavaScript syntax used for handling asynchronous operations.
+- Utilized in API calls to Edamam and when updating the DOM based on user interactions.
+
+**Event Listeners**
+- JavaScript Event Listeners are used to handle user interactions.
+- They listen for clicks on buttons like "Add Ingredient" and "Remove Ingredient," among others, to execute corresponding functionalities.
+
+## Challenges
+
+1. Dynamic Updating of Nutritional Charts
+- Problem: One of the major challenges was dynamically updating the nutritional charts in real-time as ingredients are added or removed from the recipe.
+
+- Solution: Utilized D3.js to redraw the pie and bar charts whenever an ingredient is added or removed. Had to manage asynchronous operations and state to make sure the charts were always in sync with the data.
+
+2. Handling No-Results and Empty States
+- Problem: Another challenge was dealing with "no results" from the Edamam API and ensuring that the UI still provides a good user experience.
+
+- Solution: Implemented conditional rendering to display a "No results found" message and also cleared the search form to encourage the user to try another search query.
+
+3. Accumulating and Subtracting Nutritional Values
+- Problem: Calculating and displaying per-serving nutritional values while considering that ingredients can be added or removed posed a mathematical and programming challenge.
+
+- Solution: Created utility functions that handle the math involved in adding and subtracting nutritional values. Ensured these calculations are accurate and update in real-time.
