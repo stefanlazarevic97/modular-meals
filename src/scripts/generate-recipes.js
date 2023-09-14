@@ -107,7 +107,6 @@ export function generateHTML(results) {
         }
     }
 
-
     document.querySelectorAll('.modify-recipe-button').forEach((button) => {
         button.addEventListener('click', async (event) => {
             const recipeId = event.target.dataset.recipeId;
